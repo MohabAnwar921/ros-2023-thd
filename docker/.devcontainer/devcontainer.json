@@ -1,0 +1,20 @@
+{
+  "name": "ROS Dev 2023",
+  "image": "ros-noetic-img",
+  "runArgs": [
+    "--net=host",
+    "--privileged",
+    "-e", "DISPLAY",
+    "-e", "QT_X11_NO_MITSHM=1",
+    "-v", "/tmp/.X11-unix:/tmp/.X11-unix:rw",
+    "-v", "/dev:/dev"
+  ],
+  "mounts": [
+    "source=/home/mohab/thd-mss2/autonomous-container/second-attempt/ros-2023-thd/,target=/ros_ws,type=bind"
+  ],
+  "workspaceFolder": "/ros_ws",
+  "extensions": [
+    "ms-iot.vscode-ros",
+    "ms-vscode.cpptools"
+  ]
+}
