@@ -1,0 +1,2 @@
+- [ ] Debug the /robot_state_publisher error
+    - [ ] If that doesn't work create a new chat
