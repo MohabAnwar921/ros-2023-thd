@@ -61,6 +61,10 @@
   <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>plywood_mazes</exec_depend>
   <exec_depend>roslaunch</exec_depend>
+  <exec_depend>rrt_exploration</exec_depend>
+  <exec_depend>turtlebot3_slam</exec_depend>
+  <exec_depend>turtlebot3_navigation</exec_depend>
+  <exec_depend>gmapping</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
