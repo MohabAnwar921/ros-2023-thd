@@ -1,6 +1,6 @@
 {
   "name": "ROS Dev 2023",
-  "image": "ros-noetic-img",
+  "image": "ros-turtle-img-2",
   "runArgs": [
     "--net=host",
     "--privileged",

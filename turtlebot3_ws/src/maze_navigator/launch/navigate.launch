@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Launch file for maze_navigator package that starts the maze world and spawns TurtleBot3 -->
+
+<launch>
+
+  <!-- Arguments that can be passed to this launch file -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="world_name" default="$(find plywood_mazes)/worlds/maze_3_6x6.world"/>
+  
+  <!-- TurtleBot3 model selection -->
+  <arg name="model" default="burger" doc="model type [burger, waffle, waffle_pi]"/>
+  
+  <!-- Robot spawn position -->
+  <arg name="x_pos" default="2.7"/>
+  <arg name="y_pos" default="3.0"/>
+  <arg name="z_pos" default="0.0"/>
+  <arg name="yaw" default="1.57"/>
+
+  <!-- Set TurtleBot3 model environment variable -->
+  <env name="TURTLEBOT3_MODEL" value="$(arg model)" />
+
+  <!-- Launch the plywood maze world -->
+  <include file="$(find plywood_mazes)/launch/maze_3_6x6.launch">
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="debug" value="$(arg debug)" />
+  </include>
+
+  <!-- Spawn TurtleBot3 robot -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+  
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" 
+        args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
+
+  <!-- Robot state publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+
+</launch>
