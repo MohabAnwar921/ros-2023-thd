@@ -10,6 +10,8 @@
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   <arg name="world_name" default="$(find plywood_mazes)/worlds/maze_3_6x6.world"/>
+  <arg name="cmd_vel_topic" default="/cmd_vel" />
+  <arg name="odom_topic" default="odom" />
   
   <!-- TurtleBot3 model selection -->
   <arg name="model" default="burger" doc="model type [burger, waffle, waffle_pi]"/>
@@ -52,10 +54,21 @@
     <arg name="model" value="$(arg model)" />
   </include>
 
-  <!-- Navigation stack -->
-  <include file="$(find turtlebot3_navigation)/launch/move_base.launch">
-    <arg name="model" value="$(arg model)" />
-  </include>
+    <!-- AMCL -->
+  <include file="$(find turtlebot3_navigation)/launch/amcl.launch"/>
+  
+    <!-- move_base -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+    <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find turtlebot3_navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find turtlebot3_navigation)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="$(arg odom_topic)"/>
+  </node>
 
   <!-- RRT Exploration nodes with corrected topic names -->
   <param name="namespace_init_count" value="1"/>
@@ -74,19 +87,17 @@
   </node>
  
   <!-- Filter node -->
-<node pkg="rrt_exploration" type="filter.py" name="filter" output="screen">
-  <param name="map_topic" value="/map"/>
-  <param name="info_radius" value="1.0"/> 
-  <param name="costmap_clearing_threshold" value="70"/> 
-  <param name="goals_topic" value="/detected_points"/>
-  <param name="namespace" value="robot_"/> 
-  <param name="n_robots" value="1"/>
-  <param name="rate" value="100"/>
-  <!-- Wait for map to be published before using boundaries -->
-  <param name="wait_for_map" value="true"/>
-  <param name="boundary" value="[[2.92, 3.40], [2.85, -2.41], [-2.2, -1.7], [-2.2, 2.8]]"/>
-  <param name="init_point" value="[2.7, 3.0]"/>
-</node>
+  <node pkg="rrt_exploration" type="filter.py" name="filter" output="screen">
+    <param name="map_topic" value="/map"/>
+    <param name="info_radius" value="1.0"/> 
+    <param name="costmap_clearing_threshold" value="70"/> 
+    <param name="goals_topic" value="/detected_points"/>
+    <param name="namespace" value="robot_"/> 
+    <param name="n_robots" value="1"/>
+    <param name="rate" value="100"/>
+    <!-- Auto boundary detection -->
+    <param name="boundary" value="[[2.92, 3.40], [2.85, -2.41], [-2.2, -1.7], [-2.2, 2.8]]"/>
+  </node>
   
   <!-- Assigner node - CRITICAL for autonomous exploration -->
   <node pkg="rrt_exploration" type="assigner.py" name="assigner" output="screen">

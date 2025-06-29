@@ -1,2 +1,3 @@
-#!bin/bash
-./docker/into_docker.sh
+#!/usr/bin/env bash
+
+sudo docker exec -ti ros-turtle bash

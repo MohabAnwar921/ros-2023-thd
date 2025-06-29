@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Launch file for maze_navigator package that starts the maze world, spawns TurtleBot3, and enables RRT exploration -->
+<!-- Launch file for navigator_frontier that starts the maze world, spawns TurtleBot3, and enables RRT exploration -->
 
 <launch>
 
@@ -14,7 +14,7 @@
   <!-- TurtleBot3 model selection -->
   <arg name="model" default="burger" doc="model type [burger, waffle, waffle_pi]"/>
   
-  <!-- Robot spawn position -->
+  <!-- Robot spawn position - same as navigate.launch -->
   <arg name="x_pos" default="2.7"/>
   <arg name="y_pos" default="3.0"/>
   <arg name="z_pos" default="0.0"/>
@@ -74,19 +74,17 @@
   </node>
  
   <!-- Filter node -->
-<node pkg="rrt_exploration" type="filter.py" name="filter" output="screen">
-  <param name="map_topic" value="/map"/>
-  <param name="info_radius" value="1.0"/> 
-  <param name="costmap_clearing_threshold" value="70"/> 
-  <param name="goals_topic" value="/detected_points"/>
-  <param name="namespace" value="robot_"/> 
-  <param name="n_robots" value="1"/>
-  <param name="rate" value="100"/>
-  <!-- Wait for map to be published before using boundaries -->
-  <param name="wait_for_map" value="true"/>
-  <param name="boundary" value="[[2.92, 3.40], [2.85, -2.41], [-2.2, -1.7], [-2.2, 2.8]]"/>
-  <param name="init_point" value="[2.7, 3.0]"/>
-</node>
+  <node pkg="rrt_exploration" type="filter.py" name="filter" output="screen">
+    <param name="map_topic" value="/map"/>
+    <param name="info_radius" value="1.0"/> 
+    <param name="costmap_clearing_threshold" value="70"/> 
+    <param name="goals_topic" value="/detected_points"/>
+    <param name="namespace" value="robot_"/> 
+    <param name="n_robots" value="1"/>
+    <param name="rate" value="100"/>
+    <!-- Auto boundary detection -->
+    <param name="boundary" value="[[2.92, 3.40], [2.85, -2.41], [-2.2, -1.7], [-2.2, 2.8]]"/>
+  </node>
   
   <!-- Assigner node - CRITICAL for autonomous exploration -->
   <node pkg="rrt_exploration" type="assigner.py" name="assigner" output="screen">
@@ -103,8 +101,13 @@
     <param name="rate" value="100"/>
   </node>
 
+<!-- Automatic RRT initialization node -->
+  <node pkg="maze_navigator" type="rrt_initializer.py" name="rrt_initializer" output="screen">
+    <param name="boundary" value="[[2.92, 3.40], [2.85, -2.41], [-2.2, -1.7], [-2.2, 2.8]]"/>
+    <param name="init_point" value="[0.0, 0.0]"/>
+  </node>
+
   <!-- RViz for visualization -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_slam)/rviz/turtlebot3_gmapping.rviz" />
 
 </launch>
-
